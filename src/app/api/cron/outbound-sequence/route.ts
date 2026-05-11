@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
-import { coldEmail2, coldEmail3 } from "@/actions/prospect";
+import { coldEmail2, coldEmail3, coldEmail4, coldEmail5 } from "@/actions/prospect";
 import { APP_URL } from "@/actions/lead";
 
 export async function GET(request: Request) {
@@ -16,61 +16,72 @@ export async function GET(request: Request) {
   const now = new Date();
   const daysAgo = (n: number) => new Date(now.getTime() - n * 24 * 60 * 60 * 1000);
 
-  let sent = 0;
+  type Step = { step: number; minDays: number; subject: string; fn: (email: string, name?: string | null) => string; text: string };
 
-  // Email 2 — J+3 after first email
-  const step1 = await prisma.prospect.findMany({
-    where: {
-      status: "contacted",
-      outboundStep: 1,
-      lastEmailAt: { lte: daysAgo(3) },
+  const steps: Step[] = [
+    {
+      step: 1, minDays: 3,
+      subject: "L'erreur qui coûte 800 € aux AEs chaque année",
+      fn: coldEmail2,
+      text: `AutoNet calcule ton disponible réel dès l'encaissement : ${APP_URL}/calculateur`,
     },
-    take: 50,
-  });
+    {
+      step: 2, minDays: 4,
+      subject: "Ce que disent les AEs qui utilisent AutoNet",
+      fn: coldEmail3,
+      text: `Créer un compte gratuit : ${APP_URL}/register`,
+    },
+    {
+      step: 3, minDays: 6,
+      subject: '"J\'ai déjà Excel pour ça"',
+      fn: coldEmail4,
+      text: `Tester 5 minutes : ${APP_URL}/calculateur`,
+    },
+    {
+      step: 4, minDays: 7,
+      subject: "Mon dernier message",
+      fn: coldEmail5,
+      text: `Offre lifetime 79 € : ${APP_URL}/register?offer=lifetime`,
+    },
+  ];
 
-  for (const p of step1) {
-    try {
-      await resend.emails.send({
-        from,
-        to: p.email,
-        subject: "3 AE sur 4 se trompent sur ce montant",
-        html: coldEmail2(p.email, p.firstName),
-        text: `AutoNet calcule ton disponible réel dès l'encaissement : ${APP_URL}/calculateur`,
-      });
-      await prisma.prospect.update({
-        where: { id: p.id },
-        data: { outboundStep: 2, lastEmailAt: new Date() },
-      });
-      sent++;
-    } catch { /* continue */ }
+  let totalSent = 0;
+  const breakdown: Record<string, number> = {};
+
+  for (const s of steps) {
+    const prospects = await prisma.prospect.findMany({
+      where: {
+        status: "contacted",
+        outboundStep: s.step,
+        lastEmailAt: { lte: daysAgo(s.minDays) },
+      },
+      take: 50,
+    });
+
+    let stepSent = 0;
+    for (const p of prospects) {
+      try {
+        await resend.emails.send({
+          from,
+          to: p.email,
+          subject: s.subject,
+          html: s.fn(p.email, p.firstName),
+          text: s.text,
+        });
+        await prisma.prospect.update({
+          where: { id: p.id },
+          data: {
+            outboundStep: s.step + 1,
+            lastEmailAt: new Date(),
+            status: s.step === 4 ? "contacted" : "contacted",
+          },
+        });
+        stepSent++;
+        totalSent++;
+      } catch { /* continue */ }
+    }
+    breakdown[`step${s.step + 1}`] = stepSent;
   }
 
-  // Email 3 — J+7 after second email
-  const step2 = await prisma.prospect.findMany({
-    where: {
-      status: "contacted",
-      outboundStep: 2,
-      lastEmailAt: { lte: daysAgo(4) },
-    },
-    take: 50,
-  });
-
-  for (const p of step2) {
-    try {
-      await resend.emails.send({
-        from,
-        to: p.email,
-        subject: "Dernière chose (je te laisse tranquille après)",
-        html: coldEmail3(p.email, p.firstName),
-        text: `Tester AutoNet gratuitement : ${APP_URL}/register`,
-      });
-      await prisma.prospect.update({
-        where: { id: p.id },
-        data: { outboundStep: 3, lastEmailAt: new Date() },
-      });
-      sent++;
-    } catch { /* continue */ }
-  }
-
-  return Response.json({ sent, step1: step1.length, step2: step2.length });
+  return Response.json({ totalSent, breakdown });
 }
