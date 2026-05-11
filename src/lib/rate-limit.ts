@@ -8,6 +8,7 @@ const LIMITS: Record<string, { attempts: number; windowMinutes: number }> = {
   forgotPassword: { attempts: 4, windowMinutes: 30 },
   resetPassword: { attempts: 5, windowMinutes: 30 },
   resendVerification: { attempts: 4, windowMinutes: 30 },
+  leadCapture: { attempts: 3, windowMinutes: 60 },
 };
 
 export async function assertRateLimit(key: string, action: keyof typeof LIMITS) {

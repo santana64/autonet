@@ -3,10 +3,11 @@
 import { Resend } from "resend";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { assertRateLimit } from "@/lib/rate-limit";
 
-const schema = z.object({ email: z.string().email("Email invalide.") });
+const schema = z.object({ email: z.string().email("Email invalide.").max(254) });
 
-export const FOUNDER_EMAIL = "piesse917@gmail.com";
+export const FOUNDER_EMAIL = process.env.FOUNDER_EMAIL ?? "piesse917@gmail.com";
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://autonet-psi.vercel.app";
 
 export type LeadState = { ok?: boolean; error?: string };
@@ -16,6 +17,12 @@ export async function captureLeadAction(_prev: LeadState, formData: FormData): P
   if (!parsed.success) return { error: "Email invalide." };
 
   const { email } = parsed.data;
+
+  try {
+    await assertRateLimit(email, "leadCapture");
+  } catch {
+    return { ok: true }; // silently swallow — don't reveal rate limit to bots
+  }
 
   // Save or update lead (step 1 = guide sent)
   await prisma.lead.upsert({

@@ -5,7 +5,11 @@ const cookieName = process.env.SESSION_COOKIE_NAME ?? "autonet_session";
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/app") && !request.cookies.get(cookieName)?.value) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", request.nextUrl.pathname);
+    const pathname = request.nextUrl.pathname;
+    // Only pass safe /app/* paths — never expose arbitrary params
+    if (/^\/app(\/[\w\-./]*)?$/.test(pathname)) {
+      loginUrl.searchParams.set("next", pathname);
+    }
     return NextResponse.redirect(loginUrl);
   }
   return NextResponse.next();

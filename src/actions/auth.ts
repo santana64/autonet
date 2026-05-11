@@ -74,7 +74,8 @@ export async function loginAction(_state: ActionState, formData: FormData): Prom
     return toActionError(error);
   }
 
-  redirect(next.startsWith("/app") ? next : "/app");
+  const safeNext = /^\/app(\/[\w\-./]*)?$/.test(next) ? next : "/app";
+  redirect(safeNext);
 }
 
 export async function logoutAction() {
