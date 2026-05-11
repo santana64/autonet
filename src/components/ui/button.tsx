@@ -2,14 +2,19 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const base =
-  "inline-flex min-h-10 items-center justify-center gap-2 rounded-[6px] px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#0c8c5e]/25 disabled:pointer-events-none disabled:opacity-55";
+  "inline-flex h-9 items-center justify-center gap-2 rounded-full px-5 text-[13px] font-semibold tracking-[-0.01em] transition-all duration-150 focus:outline-none focus-visible:ring-3 focus-visible:ring-[#0c8c5e]/25 disabled:pointer-events-none disabled:opacity-50 select-none";
 
 const variants = {
-  primary: "bg-[#0c8c5e] text-white shadow-[0_8px_18px_rgba(12,140,94,0.18)] hover:bg-[#08764f]",
-  secondary: "border border-[#d8dfe8] bg-white text-[#061b31] shadow-[0_1px_2px_rgba(6,27,49,0.04)] hover:bg-[#f8fafd]",
-  subtle: "bg-[#eef4f8] text-[#061b31] hover:bg-[#e5edf5]",
-  danger: "bg-red-700 text-white shadow-[0_8px_18px_rgba(185,28,28,0.16)] hover:bg-red-800",
-  ghost: "text-[#50617a] hover:bg-[#eef4f8] hover:text-[#061b31]",
+  primary:
+    "bg-[#0c8c5e] text-white shadow-[0_1px_2px_rgba(12,140,94,0.2)] hover:bg-[#08764f] active:scale-[0.98]",
+  secondary:
+    "border border-[#e2e8f0] bg-white text-[#0a0f1a] shadow-[0_1px_2px_rgba(10,15,26,0.04)] hover:bg-[#f8fafb] hover:border-[#cbd5e1] active:scale-[0.98]",
+  subtle:
+    "bg-[#f1f5f9] text-[#0a0f1a] hover:bg-[#e2e8f0] active:scale-[0.98]",
+  danger:
+    "bg-red-600 text-white shadow-[0_1px_2px_rgba(220,38,38,0.2)] hover:bg-red-700 active:scale-[0.98]",
+  ghost:
+    "text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0a0f1a]",
 };
 
 export function buttonClassName(variant: keyof typeof variants = "primary", className?: string) {
