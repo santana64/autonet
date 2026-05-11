@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BadgeEuro, Calculator, CheckCircle2, ShieldCheck, WalletCards } from "lucide-react";
+import { ArrowRight, BadgeEuro, CheckCircle2, ShieldCheck, WalletCards } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { LogoMark } from "@/components/ui/logo";
+import { EmailCapture } from "@/components/calculateur/email-capture";
 import { ACTIVITY_CATEGORIES, ActivityCategory, activityLabels } from "@/domain/activity";
 import { formatMoney, eurosToCents } from "@/domain/formatting/format";
 import { getRulesForYear, LEGAL_DISCLAIMER } from "@/domain/rules/default-rules";
 import { simulateAvailableFromGross, simulateGrossNeededForTargetNet } from "@/domain/simulator/simulator";
 
 export const metadata: Metadata = {
-  title: "Calculateur auto-entrepreneur gratuit | AutoNet",
+  title: "Calculateur auto-entrepreneur gratuit 2026 | AutoNet",
   description:
-    "Calculez combien garder après un encaissement auto-entrepreneur : cotisations, impôt optionnel, réserve prudente et argent vraiment disponible.",
+    "Calculez combien garder après un encaissement auto-entrepreneur : cotisations URSSAF, impôt optionnel, réserve prudente et argent vraiment disponible.",
 };
 
 type CalculatorParams = {
@@ -31,12 +33,10 @@ export default async function PublicCalculatorPage({
   const params = (await searchParams) ?? {};
   const activityCategory = parseActivity(params.activity);
   const taxWithholdingEnabled = params.tax === "on";
-  const profile = {
-    taxWithholdingEnabled,
-    conservativeReserveBufferRate: 0.05,
-  };
+  const profile = { taxWithholdingEnabled, conservativeReserveBufferRate: 0.05 };
   const grossValue = params.gross ?? "3000";
   const targetValue = params.target ?? "1800";
+
   const gross = simulateAvailableFromGross({
     grossAmountCents: eurosToCents(grossValue),
     activityCategory,
@@ -52,68 +52,70 @@ export default async function PublicCalculatorPage({
   });
 
   return (
-    <main className="min-h-screen bg-[#f8fafd] text-[#061b31]">
-      <header className="border-b border-[#d8dfe8] bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-3 text-lg font-bold">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#0c8c5e] text-xs text-white">
-              AN
-            </span>
+    <main className="min-h-screen bg-[#f8fafb] text-[#0a0f1a]">
+      {/* Header */}
+      <header className="border-b border-[#e2e8f0] bg-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
+          <Link href="/" className="flex items-center gap-2.5 text-[15px] font-bold tracking-[-0.02em] text-[#0a0f1a]">
+            <LogoMark size={30} />
             AutoNet
           </Link>
-          <nav className="flex items-center gap-3 text-sm">
-            <Link className="hidden text-[#50617a] hover:text-[#061b31] sm:inline" href="/#prix">
-              Prix
+          <nav className="flex items-center gap-1">
+            <Link className="hidden rounded-full px-3 py-1.5 text-[13px] font-medium text-[#64748b] transition hover:bg-[#f1f5f9] hover:text-[#0a0f1a] sm:inline-flex" href="/#prix">
+              Tarifs
             </Link>
-            <ButtonLink href="/login" variant="secondary">
+            <ButtonLink href="/login" variant="secondary" className="text-[13px]">
               Connexion
             </ButtonLink>
           </nav>
         </div>
       </header>
 
-      <section className="border-b border-[#d8dfe8] bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[0.9fr_1fr] lg:px-8">
+      {/* Hero */}
+      <section className="border-b border-[#e2e8f0] bg-white">
+        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 lg:grid-cols-[1fr_0.9fr] lg:py-16">
           <div>
-            <p className="text-sm font-semibold text-[#0c8c5e]">Calculateur auto-entrepreneur gratuit</p>
-            <h1 className="mt-4 text-4xl font-semibold text-[#061b31] sm:text-5xl">
-              J'encaisse X, je garde combien ?
-            </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-[#50617a]">
-              Entre ton chiffre d'affaires encaissé. AutoNet estime quoi mettre de côté et combien devient vraiment utilisable.
+            <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#0c8c5e]">
+              Calculateur gratuit — version 2026
             </p>
-            <div className="mt-6 flex flex-wrap gap-3 text-sm text-[#50617a]">
-              <span className="inline-flex items-center gap-2">
+            <h1 className="mt-4 text-[36px] font-black leading-[1.1] tracking-[-0.03em] text-[#0a0f1a] sm:text-[44px]">
+              J'encaisse X,<br />je garde combien ?
+            </h1>
+            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[#64748b]">
+              Entre ton chiffre d'affaires encaissé. AutoNet calcule quoi mettre de côté et combien devient vraiment utilisable.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-4 text-[13px] text-[#64748b]">
+              <span className="flex items-center gap-1.5">
                 <CheckCircle2 aria-hidden className="h-4 w-4 text-[#0c8c5e]" />
                 Sans inscription
               </span>
-              <span className="inline-flex items-center gap-2">
+              <span className="flex items-center gap-1.5">
                 <CheckCircle2 aria-hidden className="h-4 w-4 text-[#0c8c5e]" />
                 Résultat immédiat
               </span>
-              <span className="inline-flex items-center gap-2">
+              <span className="flex items-center gap-1.5">
                 <CheckCircle2 aria-hidden className="h-4 w-4 text-[#0c8c5e]" />
-                Version 2026
+                Taux officiels 2026
               </span>
             </div>
           </div>
 
-          <Card className="border-[#0c8c5e]/30">
+          <Card className="border-[#0c8c5e]/25">
             <form className="grid gap-4">
-              <label className="space-y-1.5 text-sm font-medium text-[#061b31]">
-                <span>Chiffre d'affaires encaissé ce mois-ci</span>
+              <label className="space-y-1.5">
+                <span className="text-[13px] font-semibold text-[#0a0f1a]">CA encaissé ce mois-ci (€)</span>
                 <input
-                  className="w-full rounded-[6px] border border-[#d8dfe8] px-3 py-2 text-sm"
+                  className="h-9 w-full rounded-full border border-[#e2e8f0] bg-[#f8fafb] px-4 text-[14px] text-[#0a0f1a] outline-none focus:border-[#0c8c5e]/50 focus:ring-2 focus:ring-[#0c8c5e]/15"
                   defaultValue={grossValue}
                   min="0"
                   name="gross"
                   type="number"
                 />
               </label>
-              <label className="space-y-1.5 text-sm font-medium text-[#061b31]">
-                <span>Activité</span>
+              <label className="space-y-1.5">
+                <span className="text-[13px] font-semibold text-[#0a0f1a]">Type d'activité</span>
                 <select
-                  className="w-full rounded-[6px] border border-[#d8dfe8] px-3 py-2 text-sm"
+                  className="h-9 w-full rounded-full border border-[#e2e8f0] bg-[#f8fafb] px-4 text-[14px] text-[#0a0f1a] outline-none focus:border-[#0c8c5e]/50 focus:ring-2 focus:ring-[#0c8c5e]/15"
                   defaultValue={activityCategory}
                   name="activity"
                 >
@@ -124,12 +126,12 @@ export default async function PublicCalculatorPage({
                   ))}
                 </select>
               </label>
-              <label className="flex items-center gap-3 rounded-[6px] border border-[#d8dfe8] bg-[#f8fafd] px-3 py-2 text-sm text-[#50617a]">
-                <input defaultChecked={taxWithholdingEnabled} name="tax" type="checkbox" />
+              <label className="flex cursor-pointer items-center gap-3 rounded-full border border-[#e2e8f0] bg-[#f8fafb] px-4 py-2.5 text-[13px] text-[#64748b]">
+                <input defaultChecked={taxWithholdingEnabled} name="tax" type="checkbox" value="on" className="accent-[#0c8c5e]" />
                 Versement libératoire de l'impôt activé
               </label>
               <button
-                className="inline-flex min-h-10 items-center justify-center rounded-[6px] bg-[#0c8c5e] px-4 py-2 text-sm font-semibold text-white hover:bg-[#08764f]"
+                className="h-9 w-full rounded-full bg-[#0c8c5e] text-[13px] font-semibold text-white transition hover:bg-[#08764f] active:scale-[0.98]"
                 type="submit"
               >
                 Calculer mon vrai disponible
@@ -139,59 +141,69 @@ export default async function PublicCalculatorPage({
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_0.85fr] lg:px-8">
+      {/* Results */}
+      <section className="mx-auto grid max-w-6xl gap-5 px-5 py-8 lg:grid-cols-[1fr_0.85fr]">
         <Card>
           <ModuleTitle icon={WalletCards} label="Résultat" title="Ton argent vraiment utilisable" />
-          <div className="mt-5 divide-y divide-[#d8dfe8]">
+          <div className="mt-5 divide-y divide-[#e2e8f0]">
             <ResultLine label="Tu as encaissé" value={formatMoney(gross.grossAmountCents)} />
             <ResultLine
               label="À réserver URSSAF + formation"
               value={formatMoney(gross.socialContributionEstimateCents + gross.trainingContributionEstimateCents)}
             />
-            <ResultLine label="À réserver impôt" value={formatMoney(gross.taxWithholdingEstimateCents)} />
-            <ResultLine label="Marge prudente recommandée" value={formatMoney(gross.conservativeBufferCents)} />
-            <ResultLine label="Réserve totale recommandée" value={formatMoney(gross.recommendedReserveCents)} />
-            <ResultLine label="Argent vraiment utilisable" value={formatMoney(gross.estimatedAvailableCents)} strong />
+            {gross.taxWithholdingEstimateCents > 0 && (
+              <ResultLine label="À réserver impôt (VL)" value={formatMoney(gross.taxWithholdingEstimateCents)} />
+            )}
+            <ResultLine label="Marge prudente (+5%)" value={formatMoney(gross.conservativeBufferCents)} />
+            <ResultLine label="Réserve totale à bloquer" value={formatMoney(gross.recommendedReserveCents)} />
+            <ResultLine label="Disponible réel" value={formatMoney(gross.estimatedAvailableCents)} strong />
           </div>
-          <div className="mt-5 rounded-[6px] bg-[#eef4f8] p-4 text-sm leading-6 text-[#50617a]">
-            Si tu dépenses plus que {formatMoney(gross.estimatedAvailableCents)}, tu fragilises l'argent à réserver pour ta prochaine déclaration.
+          <div className="mt-4 rounded-full bg-[#f1f5f9] px-4 py-2.5 text-[13px] leading-relaxed text-[#64748b]">
+            Si tu dépenses plus que <strong className="text-[#0a0f1a]">{formatMoney(gross.estimatedAvailableCents)}</strong>, tu fragilises ta prochaine déclaration.
           </div>
         </Card>
 
-        <div className="grid gap-6">
+        <div className="flex flex-col gap-5">
           <Card>
             <ModuleTitle icon={BadgeEuro} label="Mode salaire" title="Je veux me verser X" />
-            <form className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+            <form className="mt-4 flex gap-2">
               <input name="gross" type="hidden" value={grossValue} />
               <input name="activity" type="hidden" value={activityCategory} />
-              {taxWithholdingEnabled ? <input name="tax" type="hidden" value="on" /> : null}
+              {taxWithholdingEnabled && <input name="tax" type="hidden" value="on" />}
               <input
-                className="min-h-10 rounded-[6px] border border-[#d8dfe8] px-3 py-2 text-sm"
+                className="h-9 flex-1 rounded-full border border-[#e2e8f0] bg-[#f8fafb] px-4 text-[13px] outline-none focus:border-[#0c8c5e]/50 focus:ring-2 focus:ring-[#0c8c5e]/15"
                 defaultValue={targetValue}
                 min="0"
                 name="target"
                 type="number"
               />
               <button
-                className="inline-flex min-h-10 items-center justify-center rounded-[6px] border border-[#d8dfe8] bg-white px-4 py-2 text-sm font-semibold hover:bg-[#f8fafd]"
+                className="h-9 shrink-0 rounded-full border border-[#e2e8f0] bg-white px-4 text-[13px] font-semibold transition hover:bg-[#f1f5f9]"
                 type="submit"
               >
-                Calculer
+                OK
               </button>
             </form>
-            <p className="mt-5 text-sm text-[#50617a]">Pour te verser {formatMoney(target.estimatedAvailableCents)} utilisables, vise environ :</p>
-            <p className="mt-1 text-3xl font-semibold">{formatMoney(target.grossRevenueNeededCents)} de CA</p>
-            <p className="mt-3 text-sm leading-6 text-[#50617a]">
-              AutoNet réserverait {formatMoney(target.recommendedReserveCents)} avant de considérer ce revenu comme à toi.
+            <p className="mt-4 text-[13px] text-[#64748b]">
+              Pour te verser <strong className="text-[#0a0f1a]">{formatMoney(target.estimatedAvailableCents)}</strong> utilisables, vise :
+            </p>
+            <p className="mt-1 text-[32px] font-black tracking-[-0.025em] text-[#0a0f1a]">
+              {formatMoney(target.grossRevenueNeededCents)} de CA
+            </p>
+            <p className="mt-2 text-[12px] leading-relaxed text-[#94a3b8]">
+              AutoNet réserverait {formatMoney(target.recommendedReserveCents)} avant de considérer cet argent comme à toi.
             </p>
           </Card>
 
-          <Card className="border-[#2f6fed]/40">
-            <ModuleTitle icon={ShieldCheck} label="Compte gratuit" title="Voir le détail complet" />
-            <p className="mt-3 text-sm leading-6 text-[#50617a]">
-              En compte gratuit, tu suis tes encaissements, ton historique, tes seuils et ton argent disponible mois après mois.
+          {/* Email capture */}
+          <EmailCapture />
+
+          <Card>
+            <ModuleTitle icon={ShieldCheck} label="Compte gratuit" title="Suivre chaque mois" />
+            <p className="mt-2 text-[13px] leading-relaxed text-[#64748b]">
+              Enregistre tes encaissements, suis ta réserve URSSAF, tes seuils TVA et ton disponible réel mois après mois.
             </p>
-            <ButtonLink className="mt-5" href="/register">
+            <ButtonLink className="mt-4 w-full justify-center" href="/register">
               Créer un compte gratuit
               <ArrowRight aria-hidden className="h-4 w-4" />
             </ButtonLink>
@@ -199,24 +211,20 @@ export default async function PublicCalculatorPage({
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
-        <div className="rounded-[8px] border border-[#d8dfe8] bg-white p-5">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#2f6fed]">
-                <Calculator aria-hidden className="h-4 w-4" />
-                100 places Lifetime bêta
-              </div>
-              <p className="mt-1 text-sm leading-6 text-[#50617a]">
-                Accès Pro bêta à vie pour 79 €. Idéal si AutoNet devient ton cockpit mensuel.
-              </p>
-            </div>
-            <ButtonLink href="/register" variant="secondary">
-              Réserver ma place
-            </ButtonLink>
+      {/* Lifetime banner */}
+      <section className="mx-auto max-w-6xl px-5 pb-10">
+        <div className="flex flex-col gap-4 rounded-[10px] border border-[#e2e8f0] bg-white p-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-[13px] font-semibold text-[#2f6fed]">100 places — Lifetime bêta</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-[#64748b]">
+              Accès Pro à vie pour 79 €. Idéal si AutoNet devient ton cockpit mensuel.
+            </p>
           </div>
+          <ButtonLink href="/register" variant="secondary" className="shrink-0">
+            Réserver ma place
+          </ButtonLink>
         </div>
-        <p className="mt-5 text-xs leading-5 text-[#64748d]">{LEGAL_DISCLAIMER}</p>
+        <p className="mt-5 text-[11px] leading-5 text-[#94a3b8]">{LEGAL_DISCLAIMER}</p>
       </section>
     </main>
   );
@@ -233,20 +241,17 @@ function ModuleTitle({
 }) {
   return (
     <div>
-      <div className="flex items-center gap-2 text-sm font-semibold text-[#0c8c5e]">
-        <Icon aria-hidden className="h-4 w-4" />
-        {label}
-      </div>
-      <h2 className="mt-1 text-lg font-semibold text-[#061b31]">{title}</h2>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#0c8c5e]">{label}</p>
+      <h2 className="mt-1 text-[16px] font-bold tracking-[-0.02em] text-[#0a0f1a]">{title}</h2>
     </div>
   );
 }
 
 function ResultLine({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-3 text-sm">
-      <span className="text-[#50617a]">{label}</span>
-      <span className={`text-right tabular-nums ${strong ? "text-base font-semibold text-[#0c8c5e]" : "font-medium text-[#061b31]"}`}>
+    <div className="flex items-center justify-between gap-4 py-2.5 text-[13px]">
+      <span className="text-[#64748b]">{label}</span>
+      <span className={`tabular-nums ${strong ? "text-[15px] font-bold text-[#0c8c5e]" : "font-medium text-[#0a0f1a]"}`}>
         {value}
       </span>
     </div>
@@ -254,8 +259,6 @@ function ResultLine({ label, value, strong }: { label: string; value: string; st
 }
 
 function parseActivity(value: string | undefined): ActivityCategory {
-  if (ACTIVITY_CATEGORIES.includes(value as ActivityCategory)) {
-    return value as ActivityCategory;
-  }
+  if (ACTIVITY_CATEGORIES.includes(value as ActivityCategory)) return value as ActivityCategory;
   return "SERVICE_BNC";
 }
