@@ -12,6 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
+import { LogoMark } from "@/components/ui/logo";
 import { LEGAL_DISCLAIMER } from "@/domain/rules/default-rules";
 
 const modules = [
@@ -103,9 +104,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#061b31]/98 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <div className="flex items-center gap-2.5 text-[15px] font-bold tracking-tight text-white">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[7px] bg-[#0c8c5e] text-[11px] font-black shadow-[0_0_0_2px_rgba(12,140,94,0.35)]">
-              AN
-            </span>
+            <LogoMark size={32} />
             AutoNet
           </div>
           <nav className="flex items-center gap-1">
@@ -487,9 +486,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-2.5 text-[14px] font-bold text-[#061b31]">
-              <span className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#0c8c5e] text-[11px] font-black text-white">
-                AN
-              </span>
+              <LogoMark size={28} />
               AutoNet
             </div>
             <nav className="flex flex-wrap gap-5 text-[13px] text-[#50617a]">

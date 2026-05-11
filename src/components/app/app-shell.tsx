@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { logoutAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
+import { LogoMark } from "@/components/ui/logo";
 import { MobileNavLinks, NavLinks } from "@/components/app/nav-links";
 import { LEGAL_DISCLAIMER } from "@/domain/rules/default-rules";
 
@@ -16,11 +17,9 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-[#d8dfe8] bg-white lg:flex">
         {/* Logo */}
         <div className="border-b border-[#d8dfe8] px-4 py-4">
-          <Link className="flex items-center gap-3" href="/app">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-[#0c8c5e] text-xs font-bold text-white shadow-[0_4px_12px_rgba(12,140,94,0.25)]">
-              AN
-            </span>
-            <span className="text-base font-bold tracking-tight text-[#061b31]">AutoNet</span>
+          <Link className="flex items-center gap-2.5" href="/app">
+            <LogoMark size={32} />
+            <span className="text-[15px] font-bold tracking-tight text-[#061b31]">AutoNet</span>
           </Link>
           <p className="mt-2 text-xs font-medium text-[#64748d]">Le cockpit financier de l'indépendant.</p>
         </div>
@@ -55,9 +54,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         <header className="sticky top-0 z-10 border-b border-[#d8dfe8] bg-white/95 backdrop-blur lg:hidden">
           <div className="flex items-center justify-between px-4 py-3">
             <Link className="flex items-center gap-2 font-bold text-[#061b31]" href="/app">
-              <span className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#0c8c5e] text-xs font-bold text-white">
-                AN
-              </span>
+              <LogoMark size={28} />
               AutoNet
             </Link>
             <Link
