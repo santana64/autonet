@@ -375,3 +375,23 @@ model Lead {
 
   @@index([step, createdAt])
 }
+
+model Prospect {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  firstName    String?
+  lastName     String?
+  siret        String?
+  activity     String?
+  city         String?
+  source       String    @default("manual")
+  status       String    @default("new")
+  outboundStep Int       @default(0)
+  lastEmailAt  DateTime?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([status, outboundStep])
+  @@index([createdAt])
+}
