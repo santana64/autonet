@@ -176,7 +176,7 @@ export default async function DashboardPage({
         title="Ton vrai argent ce mois-ci"
       />
 
-      <Card className={`border-l-4 ${signal.border}`}>
+      <Card className={`border-l-4 ${signal.border} ${signal.bgTint}`}>
         <div className="grid gap-8 xl:grid-cols-[1fr_0.8fr]">
           <div>
             <div className={`inline-flex items-center gap-2 rounded-[6px] px-3 py-1 text-sm font-semibold ${signal.badge}`}>
@@ -184,7 +184,7 @@ export default async function DashboardPage({
               {signal.label}
             </div>
             <p className="mt-5 text-sm font-medium text-[#50617a]">Argent vraiment utilisable</p>
-            <h2 className="mt-2 text-4xl font-semibold text-[#061b31] sm:text-5xl">{formatMoney(safeAvailable)}</h2>
+            <h2 className="mt-2 text-5xl font-semibold tracking-tight text-[#061b31] sm:text-6xl">{formatMoney(safeAvailable)}</h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-[#50617a]">
               Tu peux te verser {formatMoney(salary.safePayableCents)} sans danger maintenant.
               {salary.safetyMarginCents > 0
@@ -536,6 +536,7 @@ const signalConfig = {
     label: "Feu vert financier",
     border: "border-l-[#0c8c5e]",
     badge: "bg-emerald-50 text-emerald-800",
+    bgTint: "bg-gradient-to-br from-emerald-50/50 to-white",
     iconColor: "text-[#0c8c5e]",
     icon: CircleCheck,
   },
@@ -543,6 +544,7 @@ const signalConfig = {
     label: "Zone orange",
     border: "border-l-[#b76e00]",
     badge: "bg-amber-50 text-amber-900",
+    bgTint: "bg-gradient-to-br from-amber-50/50 to-white",
     iconColor: "text-[#b76e00]",
     icon: CircleAlert,
   },
@@ -550,6 +552,7 @@ const signalConfig = {
     label: "À sécuriser",
     border: "border-l-red-700",
     badge: "bg-red-50 text-red-800",
+    bgTint: "bg-gradient-to-br from-red-50/50 to-white",
     iconColor: "text-red-700",
     icon: CircleAlert,
   },
@@ -559,6 +562,7 @@ const signalConfig = {
     label: string;
     border: string;
     badge: string;
+    bgTint: string;
     iconColor: string;
     icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
   }

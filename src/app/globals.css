@@ -40,11 +40,52 @@ select {
   background: rgba(12, 140, 94, 0.16);
 }
 
+/* Scrollbar subtil */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d8dfe8;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b0bec5;
+}
+
+/* Focus ring cohérent sur les inputs */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(12, 140, 94, 0.4);
+  outline-offset: 0;
+}
+
+/* Hover sur les lignes de tableau */
+tbody tr {
+  transition: background-color 100ms;
+}
+tbody tr:hover {
+  background-color: #f8fafd;
+}
+
 .ap-grid {
   background-image:
     linear-gradient(rgba(6, 27, 49, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(6, 27, 49, 0.035) 1px, transparent 1px);
   background-size: 32px 32px;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.hero-float {
+  animation: heroFloat 5s ease-in-out infinite;
 }
 
 @media print {

@@ -1,71 +1,44 @@
 import Link from "next/link";
-import {
-  BarChart3,
-  CalendarClock,
-  CreditCard,
-  FileText,
-  Gauge,
-  LayoutDashboard,
-  LogOut,
-  PiggyBank,
-  Settings,
-  TrendingUp,
-  WalletCards,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import { logoutAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
+import { MobileNavLinks, NavLinks } from "@/components/app/nav-links";
 import { LEGAL_DISCLAIMER } from "@/domain/rules/default-rules";
 
-const navItems = [
-  { href: "/app", label: "Cash", icon: LayoutDashboard },
-  { href: "/app/entries", label: "Encaissements", icon: WalletCards },
-  { href: "/app/simulateur", label: "Décisions", icon: BarChart3 },
-  { href: "/app/previsions", label: "Prévisions", icon: TrendingUp },
-  { href: "/app/reserve", label: "Réserve", icon: PiggyBank },
-  { href: "/app/seuils", label: "Seuils", icon: Gauge },
-  { href: "/app/reminders", label: "Rappels", icon: CalendarClock },
-  { href: "/app/documents", label: "Documents", icon: FileText },
-  { href: "/app/settings", label: "Réglages", icon: Settings },
-  { href: "/app/billing", label: "Offre", icon: CreditCard },
-];
+function initials(email: string) {
+  return email.slice(0, 2).toUpperCase();
+}
 
 export function AppShell({ children, userEmail }: { children: React.ReactNode; userEmail: string }) {
   return (
     <div className="min-h-screen bg-[#f8fafd] text-[#061b31]">
-      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-[#d8dfe8] bg-white lg:flex lg:flex-col">
-        <div className="border-b border-[#d8dfe8] p-5">
-          <Link href="/app" className="flex items-center gap-3 text-lg font-bold">
-            <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-[#0c8c5e] text-sm text-white shadow-[0_8px_18px_rgba(12,140,94,0.18)]">
+      {/* Sidebar desktop */}
+      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-[#d8dfe8] bg-white lg:flex">
+        {/* Logo */}
+        <div className="border-b border-[#d8dfe8] px-4 py-4">
+          <Link className="flex items-center gap-3" href="/app">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-[#0c8c5e] text-xs font-bold text-white shadow-[0_4px_12px_rgba(12,140,94,0.25)]">
               AN
             </span>
-            <span>AutoNet</span>
+            <span className="text-base font-bold tracking-tight text-[#061b31]">AutoNet</span>
           </Link>
-          <p className="mt-1 text-sm font-medium text-[#50617a]">Le cockpit financier de l'indépendant.</p>
-          <p className="mt-3 truncate rounded-[6px] border border-[#d8dfe8] bg-[#f8fafd] px-3 py-2 text-xs text-[#50617a]">
-            {userEmail}
-          </p>
+          <p className="mt-2 text-xs font-medium text-[#64748d]">Le cockpit financier de l'indépendant.</p>
         </div>
-        <nav className="flex-1 space-y-1 p-3">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm font-medium text-[#50617a] transition hover:bg-[#eef4f8] hover:text-[#061b31]"
-                href={item.href}
-                key={item.href}
-              >
-                <Icon aria-hidden className="h-4 w-4 text-[#64748d]" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="border-t border-[#d8dfe8] p-3">
+
+        {/* Nav */}
+        <NavLinks />
+
+        {/* Footer */}
+        <div className="border-t border-[#d8dfe8] px-3 py-3">
+          {/* User avatar */}
           <Link
-            className="mb-2 block rounded-[6px] bg-[#eef4f8] px-3 py-2 text-xs leading-5 text-[#50617a] hover:text-[#061b31]"
+            className="mb-2 flex items-center gap-3 rounded-[6px] px-3 py-2 transition-colors hover:bg-[#f4f7fb]"
             href="/app/account"
           >
-            Compte, sécurité et export RGPD
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#eef4f8] text-[10px] font-bold text-[#0c8c5e]">
+              {initials(userEmail)}
+            </span>
+            <span className="min-w-0 flex-1 truncate text-xs text-[#50617a]">{userEmail}</span>
           </Link>
           <form action={logoutAction}>
             <Button className="w-full" type="submit" variant="ghost">
@@ -75,25 +48,37 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           </form>
         </div>
       </aside>
-      <div className="lg:pl-72">
-        <header className="sticky top-0 z-10 border-b border-[#d8dfe8] bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
-          <div className="font-bold text-[#061b31]">AutoNet</div>
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-            {navItems.map((item) => (
-              <Link
-                className="whitespace-nowrap rounded-[6px] bg-[#eef4f8] px-3 py-2 text-xs font-medium text-[#50617a]"
-                href={item.href}
-                key={item.href}
-              >
-                {item.label}
-              </Link>
-            ))}
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Mobile top bar */}
+        <header className="sticky top-0 z-10 border-b border-[#d8dfe8] bg-white/95 backdrop-blur lg:hidden">
+          <div className="flex items-center justify-between px-4 py-3">
+            <Link className="flex items-center gap-2 font-bold text-[#061b31]" href="/app">
+              <span className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#0c8c5e] text-xs font-bold text-white">
+                AN
+              </span>
+              AutoNet
+            </Link>
+            <Link
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eef4f8] text-[10px] font-bold text-[#0c8c5e]"
+              href="/app/account"
+            >
+              {initials(userEmail)}
+            </Link>
           </div>
         </header>
+
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</main>
-        <footer className="mx-auto max-w-7xl px-4 pb-8 text-xs leading-5 text-[#64748d] sm:px-6 lg:px-8">
+
+        <footer className="mx-auto max-w-7xl px-4 pb-24 text-xs leading-5 text-[#64748d] sm:px-6 lg:pb-8 lg:px-8">
           {LEGAL_DISCLAIMER}
         </footer>
+      </div>
+
+      {/* Mobile bottom nav */}
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[#d8dfe8] bg-white/95 backdrop-blur lg:hidden">
+        <MobileNavLinks />
       </div>
     </div>
   );
