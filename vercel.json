@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/declaration-reminders",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/lead-nurture",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/user-nudge",
+      "schedule": "0 10 * * *"
     }
   ]
 }

@@ -365,3 +365,13 @@ model RateLimitEvent {
 
   @@index([key, action, createdAt])
 }
+
+model Lead {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  step        Int       @default(1)
+  createdAt   DateTime  @default(now())
+  lastEmailAt DateTime?
+
+  @@index([step, createdAt])
+}
