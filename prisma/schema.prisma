@@ -1,0 +1,367 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ActivityCategory {
+  GOODS_SALES
+  SERVICE_BIC
+  SERVICE_BNC
+  LIBERAL_CIPAV
+  LIBERAL_GENERAL
+  CRAFT_SERVICE
+  MIXED
+  ACCOMMODATION_CLASSIFIED
+  ACCOMMODATION_UNCLASSIFIED
+  OTHER
+}
+
+enum DeclarationFrequency {
+  MONTHLY
+  QUARTERLY
+}
+
+enum VatStatus {
+  FRANCHISE_BASE
+  VAT_LIABLE
+  UNKNOWN
+}
+
+enum RevenueStatus {
+  COLLECTED
+  PENDING_INVOICE
+  EXCLUDED
+}
+
+enum PeriodType {
+  MONTH
+  QUARTER
+}
+
+enum DeclarationStatus {
+  OPEN
+  READY
+  DECLARED
+  PAID
+  LATE
+}
+
+enum ReminderType {
+  DECLARATION_DUE
+  RESERVE_MISSING
+  THRESHOLD_WARNING
+  VAT_WARNING
+  CUSTOM
+}
+
+enum ReminderStatus {
+  PENDING
+  DONE
+  CANCELLED
+}
+
+enum GeneratedDocumentType {
+  MONTHLY_CASH_SUMMARY
+  DECLARATION_SUMMARY
+  ANNUAL_REVENUE_SUMMARY
+  THRESHOLD_RADAR_REPORT
+  ACCOUNTANT_EXPORT
+}
+
+enum ReserveEventType {
+  SET_ASIDE
+  RELEASED
+  ADJUSTMENT
+}
+
+enum SubscriptionPlan {
+  FREE
+  STARTER
+  PRO
+  CABINET
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  emailVerifiedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  businessProfile BusinessProfile?
+  clients          Client[]
+  revenueEntries   RevenueEntry[]
+  declarationPeriods DeclarationPeriod[]
+  reminders        Reminder[]
+  generatedDocuments GeneratedDocument[]
+  cashReserveSnapshots CashReserveSnapshot[]
+  reserveEvents    ReserveEvent[]
+  subscription     Subscription?
+  sessions         Session[]
+  verificationTokens EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model BusinessProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  businessName String?
+  ownerName String?
+  siret     String?
+  siren     String?
+  address   String?
+  postalCode String?
+  city      String?
+  email     String?
+  phone     String?
+  mainActivityCategory ActivityCategory @default(SERVICE_BNC)
+  activityCategories ActivityCategory[] @default([SERVICE_BNC])
+  mixedActivityEnabled Boolean @default(false)
+  declarationFrequency DeclarationFrequency @default(MONTHLY)
+  vatStatus VatStatus @default(UNKNOWN)
+  taxWithholdingEnabled Boolean @default(false)
+  contributionRulesYear Int @default(2026)
+  conservativeReserveBufferRate Decimal @default(0.05) @db.Decimal(5, 4)
+  reminderEmailEnabled Boolean @default(true)
+  documentFooterText String?
+  defaultSignature String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  companyName String?
+  email     String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revenueEntries RevenueEntry[]
+
+  @@index([userId])
+  @@index([userId, name])
+}
+
+model RevenueEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  clientId  String?
+  clientName String?
+  description String?
+  activityCategory ActivityCategory
+  invoiceDate DateTime?
+  collectionDate DateTime
+  grossAmountCents Int
+  paymentMethod String?
+  status RevenueStatus @default(COLLECTED)
+  estimatedContributionCents Int @default(0)
+  estimatedTaxWithholdingCents Int @default(0)
+  estimatedReserveCents Int @default(0)
+  estimatedAvailableCents Int @default(0)
+  declarationPeriodId String?
+  notes String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  declarationPeriod DeclarationPeriod? @relation(fields: [declarationPeriodId], references: [id], onDelete: SetNull)
+
+  @@index([userId, collectionDate])
+  @@index([userId, activityCategory])
+  @@index([userId, status])
+  @@index([declarationPeriodId])
+}
+
+model CashReserveSnapshot {
+  id        String   @id @default(cuid())
+  userId    String
+  snapshotDate DateTime
+  bankBalanceCents Int?
+  manuallyReservedCents Int
+  targetReserveCents Int
+  missingReserveCents Int
+  safeAvailableCents Int
+  notes String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, snapshotDate])
+  @@index([userId, createdAt])
+}
+
+model ReserveEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  type      ReserveEventType
+  amountCents Int
+  eventDate DateTime
+  note String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, eventDate])
+}
+
+model DeclarationPeriod {
+  id        String   @id @default(cuid())
+  userId    String
+  year      Int
+  periodType PeriodType
+  periodIndex Int
+  label     String
+  startDate DateTime
+  endDate   DateTime
+  dueDate   DateTime?
+  status    DeclarationStatus @default(OPEN)
+  declaredAt DateTime?
+  paidAt     DateTime?
+  notes      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revenueEntries RevenueEntry[]
+  snapshots DeclarationSnapshot[]
+  reminders Reminder[]
+  generatedDocuments GeneratedDocument[]
+
+  @@unique([userId, year, periodType, periodIndex])
+  @@index([userId, startDate])
+  @@index([userId, status])
+}
+
+model DeclarationSnapshot {
+  id        String   @id @default(cuid())
+  declarationPeriodId String
+  totalRevenueCents Int
+  estimatedSocialContributionsCents Int
+  estimatedTrainingContributionCents Int
+  estimatedTaxWithholdingCents Int
+  estimatedTotalDueCents Int
+  estimatedNetCents Int
+  breakdownJson Json
+  createdAt DateTime @default(now())
+
+  declarationPeriod DeclarationPeriod @relation(fields: [declarationPeriodId], references: [id], onDelete: Cascade)
+
+  @@index([declarationPeriodId, createdAt])
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  userId    String
+  type      ReminderType
+  title     String
+  description String?
+  dueDate   DateTime
+  status    ReminderStatus @default(PENDING)
+  relatedDeclarationPeriodId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relatedDeclarationPeriod DeclarationPeriod? @relation(fields: [relatedDeclarationPeriodId], references: [id], onDelete: SetNull)
+
+  @@index([userId, dueDate])
+  @@index([userId, status])
+}
+
+model GeneratedDocument {
+  id        String   @id @default(cuid())
+  userId    String
+  type      GeneratedDocumentType
+  title     String
+  contentHtml String
+  contentText String
+  relatedDeclarationPeriodId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relatedDeclarationPeriod DeclarationPeriod? @relation(fields: [relatedDeclarationPeriodId], references: [id], onDelete: SetNull)
+
+  @@index([userId, type])
+  @@index([userId, createdAt])
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  stripeCustomerId String?
+  stripeSubscriptionId String?
+  plan SubscriptionPlan @default(FREE)
+  status String @default("free")
+  currentPeriodEnd DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
+}
+
+model RateLimitEvent {
+  id        String   @id @default(cuid())
+  key       String
+  action    String
+  createdAt DateTime @default(now())
+
+  @@index([key, action, createdAt])
+}

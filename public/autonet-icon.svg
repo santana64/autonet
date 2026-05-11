@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="AutoNet">
+  <rect width="512" height="512" rx="96" fill="#061b31"/>
+  <path d="M128 328 213 156h86l85 172h-72l-15-34h-83l-15 34h-71Zm107-86h41l-20-49-21 49Z" fill="#ffffff"/>
+  <path d="M120 368h272" fill="none" stroke="#0c8c5e" stroke-width="42" stroke-linecap="round"/>
+</svg>

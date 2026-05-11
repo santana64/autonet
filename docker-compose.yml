@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: autonet-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: autonet
+      POSTGRES_PASSWORD: autonet
+      POSTGRES_DB: autonet
+    ports:
+      - "5434:5432"
+    volumes:
+      - autonet_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autonet -d autonet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  autonet_pg:

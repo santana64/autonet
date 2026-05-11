@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafd;
+  --foreground: #061b31;
+  --ap-ink: #061b31;
+  --ap-muted: #50617a;
+  --ap-subtle: #64748d;
+  --ap-canvas: #f8fafd;
+  --ap-band: #eef4f8;
+  --ap-line: #d8dfe8;
+  --ap-accent: #0c8c5e;
+  --ap-accent-dark: #08764f;
+  --ap-blue: #2f6fed;
+  --ap-warning: #b76e00;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  text-rendering: geometricPrecision;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(12, 140, 94, 0.16);
+}
+
+.ap-grid {
+  background-image:
+    linear-gradient(rgba(6, 27, 49, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 27, 49, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
